@@ -1,0 +1,107 @@
+[
+  {
+    "featureArea": "Agents",
+    "queryIntent": "Conceptual",
+    "queryClarity": "Clear & specific"
+  },
+  {
+    "featureArea": "Workflows",
+    "queryIntent": "Implementation",
+    "queryClarity": "Vague/ambiguous"
+  },
+  {
+    "featureArea": "RAG",
+    "queryIntent": "Comparison",
+    "queryClarity": "Clear & specific"
+  },
+  {
+    "featureArea": "Memory",
+    "queryIntent": "Configuration",
+    "queryClarity": "Wrong terminology"
+  },
+  {
+    "featureArea": "Tools & MCP",
+    "queryIntent": "Implementation",
+    "queryClarity": "Clear & specific"
+  },
+  {
+    "featureArea": "Voice",
+    "queryIntent": "Conceptual",
+    "queryClarity": "Vague/ambiguous"
+  },
+  {
+    "featureArea": "Deployment",
+    "queryIntent": "Comparison",
+    "queryClarity": "Clear & specific"
+  },
+  {
+    "featureArea": "Observability",
+    "queryIntent": "Configuration",
+    "queryClarity": "Clear & specific"
+  },
+  {
+    "featureArea": "Evals",
+    "queryIntent": "Implementation",
+    "queryClarity": "Vague/ambiguous"
+  },
+  {
+    "featureArea": "Models & Providers",
+    "queryIntent": "Conceptual",
+    "queryClarity": "Wrong terminology"
+  },
+  {
+    "featureArea": "Server & Client",
+    "queryIntent": "Comparison",
+    "queryClarity": "Clear & specific"
+  },
+  {
+    "featureArea": "Getting Started",
+    "queryIntent": "Implementation",
+    "queryClarity": "Clear & specific"
+  },
+  {
+    "featureArea": "Agents",
+    "queryIntent": "Configuration",
+    "queryClarity": "Vague/ambiguous"
+  },
+  {
+    "featureArea": "Workflows",
+    "queryIntent": "Comparison",
+    "queryClarity": "Clear & specific"
+  },
+  {
+    "featureArea": "RAG",
+    "queryIntent": "Implementation",
+    "queryClarity": "Wrong terminology"
+  },
+  {
+    "featureArea": "Memory",
+    "queryIntent": "Conceptual",
+    "queryClarity": "Clear & specific"
+  },
+  {
+    "featureArea": "Tools & MCP",
+    "queryIntent": "Comparison",
+    "queryClarity": "Vague/ambiguous"
+  },
+  {
+    "featureArea": "Voice",
+    "queryIntent": "Implementation",
+    "queryClarity": "Clear & specific"
+  },
+  {
+    "featureArea": "Deployment",
+    "queryIntent": "Conceptual",
+    "queryClarity": "Wrong terminology"
+  },
+  {
+    "featureArea": "Observability",
+    "queryIntent": "Comparison",
+    "queryClarity": "Clear & specific"
+  },
+  {
+    "featureArea": "Evals",
+    "queryIntent": "Configuration",
+    "queryClarity": "Vague/ambiguous"
+  }
+]

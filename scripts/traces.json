@@ -1,0 +1,149 @@
+[
+  {
+    "featureArea": "Agents",
+    "queryIntent": "Conceptual",
+    "queryClarity": "Clear & specific",
+    "query": "In Mastra, what exactly is an Agent and how does it decide what to do during a run (e.g., selecting tools, maintaining context/memory, and producing the final response)?",
+    "response": "In Mastra, an Agent is a configured “AI worker” that wraps:\n\n- an LLM (model)\n- instructions (its role/goals)\n- optional tools it can call\n- optional memory\n- and optional voice / processors / guardrails, etc.\n\nDuring a run, the Agent orchestrates the LLM, tools, and memory for you, so you just call `agent.generate()` / `agent.stream()` and get back structured results.\n\nBelow is how that orchestration actually works in Mastra.\n\n---\n\n## 1. What is a Mastra Agent?\n\nFrom the `Agent` reference (`reference/agents/agent.mdx`) and the agents overview (`agents/overview.mdx`):\n\nAn Agent is an object you construct, usually via:\n\n```ts\nimport { Agent } from '@mastra/core/agent';\nimport { openai } from '@ai-sdk/openai';\n\nconst supportAgent = new Agent({\n  id: 'support-agent',\n  name: 'Support Agent',\n  instructions: 'You are a helpful customer support assistant...',\n  model: openai('gpt-4o-mini'),\n  tools: { /* optional tools */ },\n  memory: /* optional Memory instance */,\n});\n```\n\nKey properties:\n\n- `id`, `name`: identity\n- `instructions`: system-level prompt that defines behavior\n- `model`: the LLM to use (any AI SDK model Mastra supports)\n- `tools`: functions (including MCP tools) the Agent is allowed to call\n- `memory`: a `Memory` instance that manages long-term / working / semantic memory\n\nYou then call:\n\n```ts\nconst res = await supportAgent.generate('User question here');\nconsole.log(res.text);\n```\n\nor streaming:\n\n```ts\nconst res = await supportAgent.stream('User question here');\nfor await (const chunk of res.textStream) {\n  process.stdout.write(chunk);\n}\n```\n\nMastra handles prompts, tool calling, and memory integration.\n\n---\n\n## 2. How an Agent decides what to do in a run\n\nAt a high level, for each `generate`/`stream` call, the Agent does:\n\n1. **Builds context**  \n   - Includes `instructions`\n   - Includes the user input\n   - Optionally includes conversation history and retrieved memory (via `memory`)\n   - Optionally includes any working memory templates\n\n2. **Lets the model decide tool usage**  \n   - Exposes tool schemas to the LLM (`tools` + MCP tools)\n   - The LLM decides whether to call tools and with what arguments (standard tool calling / function calling)\n\n3. **Executes tools and feeds results back**  \n   - Mastra calls the underlying JS tool functions or MCP tools\n   - Attaches tool responses into the conversation as messages\n   - Lets the LLM continue reasoning\n\n4. **Writes memory (if configured)**  \n   - After the run, Agent uses the `Memory` instance to store messages, working memory blocks, and (optionally) semantic embeddings\n\n5. **Produces final response**  \n   - Returns a structured result (with `.text`, `.toolCalls`, etc.), with streaming support when using `stream()`\n\nLet’s break down the major pieces relevant to your question.\n\n---\n\n## 3. Tool selection and execution\n\n### 3.1 Defining tools on an Agent\n\nYou define tools using Mastra’s tool APIs (or MCP), then attach them to the Agent:\n\n```ts\nimport { createTool } from '@mastra/core'; // see reference/tools/create-tool.mdx\n\nconst getWeather = createTool({\n  id: 'getWeather',\n  description: 'Get weather for a given city.',\n  inputSchema: z.object({\n    city: z.string(),\n  }),\n  execute: async ({ city }) => {\n    // call your weather API\n    return { city, temperatureC: 22 };\n  },\n});\n\nconst agent = new Agent({\n  id: 'weather-agent',\n  model: openai('gpt-4o-mini'),\n  instructions: 'You are a weather assistant. Use the weather tool when needed.',\n  tools: { getWeather },\n});\n```\n\nMastra exposes `getWeather` to the LLM in the underlying model’s tool-calling format.\n\n### 3.2 How the Agent “decides” to use tools\n\nThere is no hardcoded planner in Mastra; instead:\n\n- Mastra passes:\n  - your instructions\n  - the current conversation context\n  - the list of available tools (with JSON schemas and descriptions)\n- The **LLM itself** decides:\n  - whether to call a tool\n  - which tool to call\n  - tool arguments\n\nMastra then:\n\n1. Parses tool call requests from the model (using AI SDK’s tool calling).\n2. Runs the corresponding JS functions (or MCP tools).\n3. Inserts a `tool` message with results back into the conversation.\n4. Re-queries the model so it can produce a final natural-language answer that incorporates tool results.\n\nThis loop happens during one `generate` / `stream` call. From your perspective:\n\n```ts\nconst res = await agent.generate('What is the weather in Tokyo today?');\nconsole.log(res.text);  // Already includes tool results\n```\n\n### 3.3 Human-in-the-loop tool approval (optional)\n\nMastra supports “Ask Before Acting” / tool approval (see `agents/agent-approval.mdx` and the “HITL: Ask Before Acting” blog post). In that mode:\n\n- The Agent proposes tool calls\n- Your UI or API can approve / reject\n- Only approved calls get executed\n\nThis modifies “how it decides” by inserting human review in the tool selection loop.\n\n---\n\n## 4. How context & memory are maintained\n\nMastra’s memory system is documented in:\n\n- `memory/overview.mdx`\n- `memory/conversation-history.mdx`\n- `memory/semantic-recall.mdx`\n- `memory/working-memory.mdx`\n- `memory/threads-and-resources.mdx`\n- `agents/agent-memory.mdx`\n- `reference/memory/*` (programmatic APIs)\n\n### 4.1 Threads & resources\n\nEach Agent call can be associated with:\n\n- `threadId`: conversation/session id\n- `resourceId`: typically user id or resource (like `account_123`)\n\nExample from the `memory-todo-agent` example:\n\n```ts\nawait agent.stream(\n  [\n    {\n      role: 'system',\n      content: `Chat with user started now ${new Date().toISOString()}.`,\n    },\n  ],\n  {\n    threadId,\n    resourceId,\n  },\n);\n```\n\nInternally, the `Memory` instance:\n\n- Stores messages per `(threadId, resourceId)`\n- Lets you query or recall previous messages for that thread/resource\n\n### 4.2 Configuring memory on an Agent\n\nFrom `agents/agent-memory.mdx` and the `memory-todo-agent` example:\n\n```ts\nimport { Memory } from '@mastra/memory';\n\nconst memory = new Memory({\n  options: {\n    lastMessages: 1,\n    semanticRecall: false,\n    workingMemory: {\n      enabled: true,\n      template: `\n# Todo List\n## Active Items\n- Example (Due: Feb 7 3028, Started: Feb 7 2025)\n  - Description: This is an example task - replace with whatever the user needs\n\n## Completed Items\n- None yet\n`,\n    },\n  },\n});\n\nexport const todoAgent = new Agent({\n  id: 'todo-agent',\n  name: 'TODO Agent',\n  instructions: 'You are a helpful todolist AI agent...',\n  model: openai('gpt-4o-mini'),\n  memory,\n});\n```\n\n#### What these options control:\n\n- `lastMessages`: number of recent messages loaded into context for each run\n- `semanticRecall`: whether to do embedding-based recall from long-term memory and inject it into the prompt\n- `workingMemory`: a special mechanism where the Agent writes state into `<working_memory>...</working_memory>` blocks in its responses\n\n### 4.3 Working memory: how the Agent uses it\n\nIn the todo example, the instructions explicitly tell the Agent to maintain state via working memory blocks:\n\n> “You MUST save the todolist in every response message by printing out `<working_memory>` blocks. If you do not save it in working_memory you will forget - you only have access to one previous message at any time.”\n\nDuring each run:\n\n1. Mastra injects any existing working memory into the prompt using the configured template.\n2. The model updates that state and outputs new `<working_memory>` blocks.\n3. Mastra parses those tags (with utilities like `maskStreamTags`) and stores the updated working memory via `Memory`.\n\nSo the Agent “decides” what to keep by following your instructions, but **Mastra ensures the data flows in and out of memory correctly**.\n\n---\n\n## 5. Producing the final response\n\nThe Agent’s run ends when:\n\n- The LLM stops requesting additional tool calls\n- And produces a final assistant message\n\nMastra then:\n\n1. Persists the final user + assistant messages into `Memory` (if configured), keyed by `threadId` / `resourceId`.\n2. Returns a response object, e.g. for `generate()`:\n\n   - `text`: final assistant text\n   - `toolCalls`: any tool invocations that happened\n   - `usage`, `raw` model data, etc. (see `reference/agents/generate.mdx`)\n\n   For `stream()`:\n\n   - `textStream`: async iterator of text chunks\n   - `toolCallsStream` (depending on model/tool usage)\n   - Proper integration with Mastra’s streaming utilities (`maskStreamTags`, nested streams, etc.)\n\nExample (from `memory-todo-agent`):\n\n```ts\nconst res = await agent.stream(answer, { threadId, resourceId });\n\nconst maskedStream = maskStreamTags(res.textStream, 'working_memory', {\n  onStart: () => memorySpinner.start(),\n  onEnd: () => memorySpinner.succeed(),\n});\n\nfor await (const chunk of maskedStream) {\n  process.stdout.write(chunk);\n}\n```\n\nHere:\n\n- `maskStreamTags` hides the `<working_memory>` parts from the user-facing output\n- But those tags are still captured by Mastra and written into memory\n\n---\n\n## 6. Mental model: How to “think about” a Mastra Agent\n\nYou can think of a Mastra Agent as:\n\n> “A configured LLM runtime that knows its role, has access to specific tools, and can remember things via Mastra Memory.”\n\nDuring each run:\n\n1. **Prompt building:** Agent composes system instructions + user input + memory context\n2. **Planning & acting (within the model):** the LLM decides:\n   - whether to call tools\n   - in what sequence\n   - how to use the results\n3. **Execution (in Mastra):** Mastra:\n   - executes tools\n   - manages message history and working memory\n   - streams results to your app\n4. **Final answer:** Agent returns a structured result, while persisting new messages and updated working memory.\n\nIf you want more control (multi-agent workflows, separate planners, etc.), you use Agent Networks or Workflows on top of this, but the single Agent behavior stays the same.\n\n---\n\n## Learn More\n\nValidated links:\n\n### Documentation\n- Agents Overview – what an Agent is, configuration options, and patterns  \n  https://mastra.ai/docs/agents\n- Agent Memory (how memory integrates with Agents, working memory patterns)  \n  https://mastra.ai/docs/memory\n\n### Examples\n- `memory-todo-agent` example – full working project showing an Agent using working memory and streaming  \n  https://github.com/mastra-ai/mastra/tree/main/examples/memory-todo-agent\n\n### Blog Posts\n- Using Mastra’s Agent Memory API – deeper explanation of threads, resources, and working memory  \n  https://mastra.ai/blog/agent-memory-guide\n- HITL: Ask Before Acting – how human-in-the-loop tool approval works with Agents  \n  https://mastra.ai/blog/tool-approval\n- Dynamic Agents: Inserting Runtime Context in Mastra – how Agents build context dynamically  \n  https://mastra.ai/blog/dynamic-agents"
+  },
+  {
+    "featureArea": "Workflows",
+    "queryIntent": "Implementation",
+    "queryClarity": "Vague/ambiguous",
+    "query": "I'm trying to build some kind of workflow in Mastra that runs a few steps in order (and maybe branches depending on the result). How do I set that up, and what do I need to define to get it running?",
+    "response": "Error: fetch failed"
+  },
+  {
+    "featureArea": "RAG",
+    "queryIntent": "Comparison",
+    "queryClarity": "Clear & specific",
+    "query": "In Mastra RAG, what are the trade-offs between using a vector store for semantic retrieval vs a keyword/BM25-style retriever for the same knowledge base? Specifically, when would you choose one over the other, and can they be combined in a hybrid retriever setup?",
+    "response": "Error: fetch failed"
+  },
+  {
+    "featureArea": "Memory",
+    "queryIntent": "Configuration",
+    "queryClarity": "Wrong terminology",
+    "query": "How do I configure Mastra's “session cache” so my agent remembers the last few chats across runs, and can I set how long that cache lives or how many messages it stores?",
+    "response": "Error: fetch failed"
+  },
+  {
+    "featureArea": "Tools & MCP",
+    "queryIntent": "Implementation",
+    "queryClarity": "Clear & specific",
+    "query": "How do I implement an MCP tool in Mastra and register it so my agent can call it (including the code to define the tool, connect to an MCP server, and add it to the agent's tool list)?",
+    "response": "Error: fetch failed"
+  },
+  {
+    "featureArea": "Voice",
+    "queryIntent": "Conceptual",
+    "queryClarity": "Vague/ambiguous",
+    "query": "I'm trying to understand how Mastra “voice” works overall—like what parts are involved and what I actually need to set up to make an agent talk and listen. Can someone explain the basic flow?",
+    "response": "Error: fetch failed"
+  },
+  {
+    "featureArea": "Deployment",
+    "queryIntent": "Comparison",
+    "queryClarity": "Clear & specific",
+    "query": "For deploying a Mastra app, what are the trade-offs between using the Mastra Cloud deployment option vs self-hosting (e.g., on my own Kubernetes/Docker setup)? Specifically, how do they compare on scaling, secrets/env var management, observability/logging, and CI/CD workflow?",
+    "response": "Error: fetch failed"
+  },
+  {
+    "featureArea": "Observability",
+    "queryIntent": "Configuration",
+    "queryClarity": "Clear & specific",
+    "query": "How do I configure observability in Mastra to export traces and metrics to OpenTelemetry? Specifically, where do I set the OTLP endpoint and headers (e.g., for an API key), and can I enable/disable tracing or metrics separately per environment (dev vs prod)?",
+    "response": "Error: fetch failed"
+  },
+  {
+    "featureArea": "Evals",
+    "queryIntent": "Implementation",
+    "queryClarity": "Vague/ambiguous",
+    "query": "I'm trying to add evals to my Mastra agent, but I'm not sure where to start—do I need to write tests for the prompts, or is there a built-in eval runner? How do I actually set this up so it can score my agent's responses?",
+    "response": "Error: fetch failed"
+  },
+  {
+    "featureArea": "Models & Providers",
+    "queryIntent": "Conceptual",
+    "queryClarity": "Wrong terminology",
+    "query": "Does Mastra have built-in “LLM drivers” or a model registry that automatically installs and manages different AI engines (like OpenAI/Anthropic), or do I need to plug in my own provider adapters? I'm trying to understand how Mastra's models/providers concept works.",
+    "response": "Error: fetch failed"
+  },
+  {
+    "featureArea": "Server & Client",
+    "queryIntent": "Comparison",
+    "queryClarity": "Clear & specific",
+    "query": "In Mastra's Server & Client setup, what are the key differences between calling an agent from the server (e.g., using the Mastra server runtime) versus calling it directly from a client app? I'm trying to decide which approach to use for a web app and want to compare things like auth/security, latency, streaming support, and how state/history is handled.",
+    "response": "Error: fetch failed"
+  },
+  {
+    "featureArea": "Getting Started",
+    "queryIntent": "Implementation",
+    "queryClarity": "Clear & specific",
+    "query": "I'm starting a brand-new Mastra project—can you walk me through the exact steps to bootstrap it from scratch (CLI install, creating the project, adding my first agent/workflow, and running it locally)? Please include the commands and the minimum files I need to touch.",
+    "response": "Error: fetch failed"
+  },
+  {
+    "featureArea": "Agents",
+    "queryIntent": "Configuration",
+    "queryClarity": "Vague/ambiguous",
+    "query": "I'm trying to configure an agent in Mastra, but I'm not sure what I'm supposed to set up first. What are the main settings I need to define (like model/tools/memory or whatever it uses), and where do I put those configs?",
+    "response": "Error: fetch failed"
+  },
+  {
+    "featureArea": "Workflows",
+    "queryIntent": "Comparison",
+    "queryClarity": "Clear & specific",
+    "query": "In Mastra Workflows, what's the difference between using a normal step vs a conditional/branching step for routing logic? I'm trying to decide whether to model an if/else path inside one workflow or split it into separate workflows—when should I prefer one approach over the other?",
+    "response": "Error: fetch failed"
+  },
+  {
+    "featureArea": "RAG",
+    "queryIntent": "Implementation",
+    "queryClarity": "Wrong terminology",
+    "query": "How do I set up a RAG pipeline in Mastra to do “semantic caching” of my PDFs—like embed them into a vector database and then have the agent pull the right chunks when it answers? I'm looking for the code to create the semantic cache + hook it into my chat agent.",
+    "response": "Error: fetch failed"
+  },
+  {
+    "featureArea": "Memory",
+    "queryIntent": "Conceptual",
+    "queryClarity": "Clear & specific",
+    "query": "In Mastra, what's the difference between short-term (session) memory and long-term memory, and how does the framework decide what gets stored or retrieved from each during a conversation?",
+    "response": "Error: fetch failed"
+  },
+  {
+    "featureArea": "Tools & MCP",
+    "queryIntent": "Comparison",
+    "queryClarity": "Vague/ambiguous",
+    "query": "I'm looking at Mastra tools vs MCP and I'm not sure which one I should use—are they basically the same thing, or do they solve different problems? When would I pick one over the other?",
+    "response": "Error: fetch failed"
+  },
+  {
+    "featureArea": "Voice",
+    "queryIntent": "Implementation",
+    "queryClarity": "Clear & specific",
+    "query": "How do I implement a voice interface in Mastra that streams microphone audio to an agent and streams the agent's spoken response back in real time? Please include a basic TypeScript example showing how to start/stop recording, send audio chunks, handle partial transcripts, and play back the returned audio.",
+    "response": "Error: fetch failed"
+  },
+  {
+    "featureArea": "Deployment",
+    "queryIntent": "Conceptual",
+    "queryClarity": "Wrong terminology",
+    "query": "Does Mastra support serverless hosting for my agents, like can I deploy an “agent lambda” that auto-scales and runs on-demand, or do I need to run a dedicated Mastra server/container?",
+    "response": "Error: fetch failed"
+  },
+  {
+    "featureArea": "Observability",
+    "queryIntent": "Comparison",
+    "queryClarity": "Clear & specific",
+    "query": "In Mastra observability, what's the difference between tracing and logging, and when should I use each for debugging an agent workflow (e.g., tool calls and step-by-step execution)?",
+    "response": "Error: fetch failed"
+  },
+  {
+    "featureArea": "Evals",
+    "queryIntent": "Configuration",
+    "queryClarity": "Vague/ambiguous",
+    "query": "I'm trying to set up evals for my Mastra agent, but I'm not sure what I'm supposed to configure. Where do I define the evals and what settings do I need to change to make them run the way I want?",
+    "response": "Error: fetch failed"
+  }
+]

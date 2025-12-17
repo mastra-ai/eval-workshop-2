@@ -1,27 +1,40 @@
-
-import { Mastra } from '@mastra/core/mastra';
-import { PinoLogger } from '@mastra/loggers';
-import { LibSQLStore } from '@mastra/libsql';
-import { Observability } from '@mastra/observability';
-import { weatherWorkflow } from './workflows/weather-workflow';
-import { weatherAgent } from './agents/weather-agent';
-import { toolCallAppropriatenessScorer, completenessScorer, translationScorer } from './scorers/weather-scorer';
+import { Mastra } from "@mastra/core/mastra";
+import { PinoLogger } from "@mastra/loggers";
+import { LibSQLStore } from "@mastra/libsql";
+import { DefaultExporter, Observability } from "@mastra/observability";
+import { LangfuseExporter } from "@mastra/langfuse";
+import { BraintrustExporter } from "@mastra/braintrust";
+import { docsAgent } from "./agents/docs-agent";
 
 export const mastra = new Mastra({
-  workflows: { weatherWorkflow },
-  agents: { weatherAgent },
-  scorers: { toolCallAppropriatenessScorer, completenessScorer, translationScorer },
+  agents: {
+    docsAgent,
+  },
   storage: new LibSQLStore({
     id: "mastra-storage",
-    // stores observability, scores, ... into memory storage, if it needs to persist, change to file:../mastra.db
-    url: ":memory:",
+    url: `file:../../mastra.db`,
   }),
   logger: new PinoLogger({
-    name: 'Mastra',
-    level: 'info',
+    name: "Mastra",
+    level: "info",
   }),
   observability: new Observability({
-    // Enables DefaultExporter and CloudExporter for tracing
-    default: { enabled: true },
-    }),
+    configs: {
+      all: {
+        serviceName: "docs-agent-analysis",
+        exporters: [
+          new DefaultExporter(),
+          new LangfuseExporter({
+            publicKey: process.env.LANGFUSE_PUBLIC_KEY,
+            secretKey: process.env.LANGFUSE_SECRET_KEY,
+            baseUrl: process.env.LANGFUSE_BASE_URL,
+          }),
+          new BraintrustExporter({
+            apiKey: process.env.BRAINTRUST_API_KEY,
+            projectName: process.env.BRAINTRUST_PROJECT_NAME,
+          }),
+        ],
+      },
+    },
+  }),
 });
