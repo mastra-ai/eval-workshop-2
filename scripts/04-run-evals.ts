@@ -1,5 +1,5 @@
 import { runEvals } from "@mastra/core/evals";
-import { allQueries } from "./queries";
+import { allQueries } from "./queries-example";
 import { mastra } from "../src/mastra";
 import { mdxPathScorer } from "../src/mastra/scorers/mdx-path-scorer";
 import { relevantLinkScorer } from "../src/mastra/scorers/relevant-link-scorer";

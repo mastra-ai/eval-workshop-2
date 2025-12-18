@@ -68,6 +68,7 @@ The agent is configured to:
 | `pnpm tuple-generation` | Generate dimension tuples for synthetic queries |
 | `pnpm query-generation` | Generate synthetic user queries from tuples |
 | `pnpm generate-traces` | Run queries against the agent to generate traces |
+| `pnpm run-evals` | Run batch evaluations with scorers |
 
 ## Workshop Documentation
 
@@ -92,6 +93,12 @@ Create custom scorers to detect failure modes:
 2. Learn the four-step scorer pipeline
 3. Build a code-based scorer (example: detecting `.mdx` paths)
 
+### [04-applying-scorers.md](workshop/04-applying-scorers.md)
+Apply scorers to evaluate your agent:
+1. Attach scorers to an agent for online evals (production monitoring)
+2. Run batch evals for offline testing before deploying
+3. Configure sampling rates to control evaluation frequency
+
 ## Project Structure
 
 ```
@@ -108,13 +115,15 @@ Create custom scorers to detect failure modes:
 │   ├── 01-tuple-generation.ts  # Generate dimension tuples
 │   ├── 02-query-generation.ts  # Generate queries from tuples
 │   ├── 03-generate-traces.ts   # Run queries and collect traces
+│   ├── 04-run-evals.ts         # Run batch evaluations
 │   ├── tuples.json             # Generated tuples
 │   ├── queries.json            # Generated queries
 │   └── traces.json             # Collected traces
 └── workshop/
     ├── 01-synthetic-dataset.md
     ├── 02-trace.md
-    └── 03-create-scorer.md
+    ├── 03-create-scorer.md
+    └── 04-applying-scorers.md
 ```
 
 ## Observability
