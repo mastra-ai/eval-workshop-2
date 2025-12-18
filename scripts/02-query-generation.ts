@@ -171,12 +171,8 @@ async function main() {
   }> = [];
 
   // Process each tuple
-  for (let i = 0; i < tuples.length; i++) {
-    const tuple = tuples[i];
-    console.log(
-      `[${i + 1}/${tuples.length}] Processing: ${tuple.featureArea} - ${tuple.queryIntent} - ${tuple.queryClarity}`
-    );
-
+  for (const tuple of tuples) {
+    console.log(`Processing: ${tuple.featureArea} - ${tuple.queryIntent} - ${tuple.queryClarity}`);
     try {
       // Select relevant paths
       const selectedPaths = await selectRelevantPaths(

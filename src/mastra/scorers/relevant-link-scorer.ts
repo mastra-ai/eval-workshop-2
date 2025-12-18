@@ -12,10 +12,9 @@ export const relevantLinkScorer = createScorer({
 })
   .preprocess({
     description: "Extract links from the response",
-
     judge: {
       model: "openai/gpt-4o-mini",
-      instructions: `You are a precise text parser. Your task is to extract all URLs from a user message along with their surrounding context/description.
+      instructions: `You are a precise text parser. Your task is to extract all URLs from a response along with their surrounding context/description.
   
 OUTPUT FORMAT:
 Return a JSON object with a links array:

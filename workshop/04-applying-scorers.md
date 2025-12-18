@@ -43,7 +43,6 @@ export const docsAgent = new Agent({
 
 - **Production monitoring** Track quality metrics in real-time
 - **Continuous evaluation** Every interaction gets scored automatically
-- **Observability integration** Scores flow to Langfuse, Braintrust, etc.
 
 ### Sampling
 
