@@ -29,6 +29,6 @@ export const mdxPathScorer = createScorer({
       return "No .mdx file paths found. Response uses proper URLs.";
     }
 
-    return `Found ${mdxPaths.length} .mdx file path(s) that should be URLs: ${mdxPaths.join(", ")}`;
+    return `Found ${mdxPaths.length} file path(s) that should be URLs: ${mdxPaths.join(", ")}`;
   });
 

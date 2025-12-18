@@ -1,8 +1,8 @@
-# Generating a Synthetic dataset
+# Generating Synthetic data
 
 ## 1. Dimensions of a user query
 
-A dimension is a key axis of variation for a user query.
+A dimension is one way that user queries can differ from each other.
 
 For this exercise come up with three dimensions of the Mastra chatbot.
 

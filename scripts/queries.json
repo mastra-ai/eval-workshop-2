@@ -1,10 +1,10 @@
 [
   {
     "featureArea": "Agents",
-    "queryIntent": "Conceptual",
+    "queryIntent": "Implementation",
     "queryClarity": "Clear & specific",
-    "query": "In Mastra, what exactly is an Agent and how does it decide what to do during a run (e.g., selecting tools, maintaining context/memory, and producing the final response)?",
-    "reasoning": "This is a conceptual question about the Agents feature area, asking for an explanation of what an Agent is and how it works, using specific, correct terminology and concrete aspects like tool selection and context handling.",
+    "query": "How do I implement an Agent in Mastra that can call a tool and maintain conversation state across turns?",
+    "reasoning": "Matches Agents + Implementation by asking how to build an agent with tools and state. It’s clear and specific: it requests a minimal end-to-end example (define agent, register tool, run with message) using correct agent terminology.",
     "documentationPaths": [
       "agents/",
       "reference/agents/"
@@ -12,10 +12,10 @@
   },
   {
     "featureArea": "Workflows",
-    "queryIntent": "Implementation",
+    "queryIntent": "Comparison",
     "queryClarity": "Vague/ambiguous",
-    "query": "I'm trying to build some kind of workflow in Mastra that runs a few steps in order (and maybe branches depending on the result). How do I set that up, and what do I need to define to get it running?",
-    "reasoning": "Matches Workflows + Implementation because it asks how to build/run a workflow, but stays vague by not specifying exact workflow type, steps, triggers, or desired behavior beyond “a few steps” and “maybe branches.”",
+    "query": "I’m looking at Mastra workflows and I’m not sure when I should use a workflow vs just chaining a few agent/tool calls together. What’s the difference, and which one is better for building a multi-step automation?",
+    "reasoning": "Targets the Workflows feature area with a comparison intent (workflow vs chaining calls), but stays vague about the specific use case, requirements, or constraints, making it ambiguous.",
     "documentationPaths": [
       "workflows/",
       "reference/workflows/",
@@ -23,22 +23,11 @@
     ]
   },
   {
-    "featureArea": "RAG",
-    "queryIntent": "Comparison",
-    "queryClarity": "Clear & specific",
-    "query": "In Mastra RAG, what are the trade-offs between using a vector store for semantic retrieval vs a keyword/BM25-style retriever for the same knowledge base? Specifically, when would you choose one over the other, and can they be combined in a hybrid retriever setup?",
-    "reasoning": "This is a clear, specific comparison question focused on the RAG feature area, asking for differences, use cases, and whether both approaches can be used together.",
-    "documentationPaths": [
-      "rag/",
-      "reference/rag/"
-    ]
-  },
-  {
     "featureArea": "Memory",
-    "queryIntent": "Configuration",
+    "queryIntent": "Conceptual",
     "queryClarity": "Wrong terminology",
-    "query": "How do I configure Mastra's “session cache” so my agent remembers the last few chats across runs, and can I set how long that cache lives or how many messages it stores?",
-    "reasoning": "This asks about configuring Memory behavior (retention/size), but uses wrong terminology (“session cache”) instead of Mastra's memory/store concepts, matching Configuration + Wrong terminology in the Memory feature area.",
+    "query": "Does Mastra have a built‑in “cache” for an agent’s past chats, like a session store? I’m trying to understand how the memory feature works—does it automatically save conversation history and reload it on the next request, or do I have to wire up the cache manually?",
+    "reasoning": "Feature area is Memory and the intent is conceptual (asking how it works). It uses wrong terminology by referring to memory as a “cache”/“session store,” which is close but not the official concept.",
     "documentationPaths": [
       "memory/",
       "reference/memory/"
@@ -46,152 +35,10 @@
   },
   {
     "featureArea": "Tools & MCP",
-    "queryIntent": "Implementation",
-    "queryClarity": "Clear & specific",
-    "query": "How do I implement an MCP tool in Mastra and register it so my agent can call it (including the code to define the tool, connect to an MCP server, and add it to the agent's tool list)?",
-    "reasoning": "This asks for step-by-step build instructions (implementation) in the Tools & MCP feature area, and it's clear and specific about defining a tool, connecting to an MCP server, and wiring it into an agent.",
-    "documentationPaths": [
-      "tools/",
-      "mcp/",
-      "reference/tools/"
-    ]
-  },
-  {
-    "featureArea": "Voice",
-    "queryIntent": "Conceptual",
-    "queryClarity": "Vague/ambiguous",
-    "query": "I'm trying to understand how Mastra “voice” works overall—like what parts are involved and what I actually need to set up to make an agent talk and listen. Can someone explain the basic flow?",
-    "reasoning": "This asks for a high-level explanation of the Voice feature (conceptual intent) but stays vague about specifics like providers, APIs, or exact use case, making it ambiguous.",
-    "documentationPaths": [
-      "voice/",
-      "reference/voice/",
-      "guides/voice/"
-    ]
-  },
-  {
-    "featureArea": "Deployment",
-    "queryIntent": "Comparison",
-    "queryClarity": "Clear & specific",
-    "query": "For deploying a Mastra app, what are the trade-offs between using the Mastra Cloud deployment option vs self-hosting (e.g., on my own Kubernetes/Docker setup)? Specifically, how do they compare on scaling, secrets/env var management, observability/logging, and CI/CD workflow?",
-    "reasoning": "This is a clear, specific comparison question focused on the Deployment feature area, asking for differences and trade-offs between two deployment approaches across concrete criteria.",
-    "documentationPaths": [
-      "deployment/",
-      "reference/deployment/",
-      "guides/deployment/"
-    ]
-  },
-  {
-    "featureArea": "Observability",
     "queryIntent": "Configuration",
     "queryClarity": "Clear & specific",
-    "query": "How do I configure observability in Mastra to export traces and metrics to OpenTelemetry? Specifically, where do I set the OTLP endpoint and headers (e.g., for an API key), and can I enable/disable tracing or metrics separately per environment (dev vs prod)?",
-    "reasoning": "This is a configuration-focused question about Mastra Observability, asking for specific setup options (OTLP endpoint, headers, toggling traces/metrics per environment). It's clear and specific, with concrete requirements and correct terminology (OpenTelemetry/OTLP, traces, metrics).",
-    "documentationPaths": [
-      "observability/",
-      "reference/observability/",
-      "guides/observability/"
-    ]
-  },
-  {
-    "featureArea": "Evals",
-    "queryIntent": "Implementation",
-    "queryClarity": "Vague/ambiguous",
-    "query": "I'm trying to add evals to my Mastra agent, but I'm not sure where to start—do I need to write tests for the prompts, or is there a built-in eval runner? How do I actually set this up so it can score my agent's responses?",
-    "reasoning": "Feature area is Evals and the intent is implementation (asking how to set up/run evals). It's vague/ambiguous because it doesn't specify which eval type, what framework/environment they're using, what metrics they want, or what part of Mastra they've already built.",
-    "documentationPaths": [
-      "evals/",
-      "reference/evals/",
-      "guides/evals/"
-    ]
-  },
-  {
-    "featureArea": "Models & Providers",
-    "queryIntent": "Conceptual",
-    "queryClarity": "Wrong terminology",
-    "query": "Does Mastra have built-in “LLM drivers” or a model registry that automatically installs and manages different AI engines (like OpenAI/Anthropic), or do I need to plug in my own provider adapters? I'm trying to understand how Mastra's models/providers concept works.",
-    "reasoning": "Feature area is Models & Providers and the intent is conceptual (how the models/providers system works). The query uses wrong terminology like “LLM drivers,” “model registry,” and “automatically installs,” which are close-but-incorrect terms for providers/adapters/configuration in Mastra.",
-    "documentationPaths": [
-      "models/",
-      "providers/",
-      "reference/models/"
-    ]
-  },
-  {
-    "featureArea": "Server & Client",
-    "queryIntent": "Comparison",
-    "queryClarity": "Clear & specific",
-    "query": "In Mastra's Server & Client setup, what are the key differences between calling an agent from the server (e.g., using the Mastra server runtime) versus calling it directly from a client app? I'm trying to decide which approach to use for a web app and want to compare things like auth/security, latency, streaming support, and how state/history is handled.",
-    "reasoning": "Matches Server & Client feature area and uses a clear comparison intent (server-side vs client-side invocation) with specific evaluation criteria (security, latency, streaming, state/history).",
-    "documentationPaths": [
-      "server-client/",
-      "reference/server-client/",
-      "guides/server-client/"
-    ]
-  },
-  {
-    "featureArea": "Getting Started",
-    "queryIntent": "Implementation",
-    "queryClarity": "Clear & specific",
-    "query": "I'm starting a brand-new Mastra project—can you walk me through the exact steps to bootstrap it from scratch (CLI install, creating the project, adding my first agent/workflow, and running it locally)? Please include the commands and the minimum files I need to touch.",
-    "reasoning": "Matches Getting Started + Implementation because it asks for step-by-step setup and building a first working project, and it's clear & specific with concrete tasks (CLI install, project creation, first agent/workflow, run locally) and request for commands/files.",
-    "documentationPaths": [
-      "getting-started/",
-      "reference/getting-started/",
-      "guides/getting-started/"
-    ]
-  },
-  {
-    "featureArea": "Agents",
-    "queryIntent": "Configuration",
-    "queryClarity": "Vague/ambiguous",
-    "query": "I'm trying to configure an agent in Mastra, but I'm not sure what I'm supposed to set up first. What are the main settings I need to define (like model/tools/memory or whatever it uses), and where do I put those configs?",
-    "reasoning": "Targets the Agents feature area and asks about configuration (“main settings”, “where do I put those configs”). It's vague/ambiguous because it doesn't specify the agent type, use case, or which part of configuration they're stuck on, and uses imprecise terminology (“whatever it uses”).",
-    "documentationPaths": [
-      "agents/",
-      "reference/agents/"
-    ]
-  },
-  {
-    "featureArea": "Workflows",
-    "queryIntent": "Comparison",
-    "queryClarity": "Clear & specific",
-    "query": "In Mastra Workflows, what's the difference between using a normal step vs a conditional/branching step for routing logic? I'm trying to decide whether to model an if/else path inside one workflow or split it into separate workflows—when should I prefer one approach over the other?",
-    "reasoning": "This is a comparison question within the Workflows feature area, clearly and specifically contrasting two workflow design approaches (steps with branching vs separate workflows) and asking when to use each.",
-    "documentationPaths": [
-      "workflows/",
-      "reference/workflows/",
-      "guides/workflows/"
-    ]
-  },
-  {
-    "featureArea": "RAG",
-    "queryIntent": "Implementation",
-    "queryClarity": "Wrong terminology",
-    "query": "How do I set up a RAG pipeline in Mastra to do “semantic caching” of my PDFs—like embed them into a vector database and then have the agent pull the right chunks when it answers? I'm looking for the code to create the semantic cache + hook it into my chat agent.",
-    "reasoning": "Targets the RAG feature area with an implementation-focused request (code/setup for indexing PDFs and retrieval). Uses wrong terminology by calling the RAG knowledge base/index a “semantic cache,” which is related but not the correct Mastra/RAG term.",
-    "documentationPaths": [
-      "rag/",
-      "reference/rag/"
-    ]
-  },
-  {
-    "featureArea": "Memory",
-    "queryIntent": "Conceptual",
-    "queryClarity": "Clear & specific",
-    "query": "In Mastra, what's the difference between short-term (session) memory and long-term memory, and how does the framework decide what gets stored or retrieved from each during a conversation?",
-    "reasoning": "Targets the Memory feature area with a conceptual intent (asking how memory types work) and is clear/specific by naming short-term vs long-term memory and asking about storage/retrieval behavior.",
-    "documentationPaths": [
-      "memory/",
-      "reference/memory/",
-      "guides/memory/"
-    ]
-  },
-  {
-    "featureArea": "Tools & MCP",
-    "queryIntent": "Comparison",
-    "queryClarity": "Vague/ambiguous",
-    "query": "I'm looking at Mastra tools vs MCP and I'm not sure which one I should use—are they basically the same thing, or do they solve different problems? When would I pick one over the other?",
-    "reasoning": "This asks for a comparison between Tools and MCP and which to choose (comparison intent), but it's vague because it doesn't specify the user's use case, environment, or what they're trying to integrate/build.",
+    "query": "I’m using Mastra Tools with an MCP server and I want to configure which tools get exposed to my agent. How do I define an allowlist/denylist of MCP tools, and can I override a tool’s name/description (or disable it) when registering the MCP client?",
+    "reasoning": "This is a configuration-focused question in the Tools & MCP area, asking for specific setup options (tool allow/deny lists, overriding metadata, disabling tools) with clear terminology and concrete goals.",
     "documentationPaths": [
       "tools/",
       "mcp/",
@@ -201,48 +48,13 @@
   {
     "featureArea": "Voice",
     "queryIntent": "Implementation",
-    "queryClarity": "Clear & specific",
-    "query": "How do I implement a voice interface in Mastra that streams microphone audio to an agent and streams the agent's spoken response back in real time? Please include a basic TypeScript example showing how to start/stop recording, send audio chunks, handle partial transcripts, and play back the returned audio.",
-    "reasoning": "Feature Area is Voice and the intent is Implementation because it asks for a concrete end-to-end build with code. It's clear & specific because it mentions streaming mic audio, real-time responses, TypeScript, and specific handling steps (start/stop, chunking, partial transcripts, playback).",
+    "queryClarity": "Vague/ambiguous",
+    "query": "I’m trying to add voice to my Mastra app—like letting users talk and having the agent speak back. What do I actually need to set up to make that work, and is there a basic example of how to wire it together?",
+    "reasoning": "Targets the Voice feature area with an implementation intent (how to build/add voice). It’s vague/ambiguous because it doesn’t specify which voice components (STT/TTS, provider, client vs server), platform, or exact Mastra APIs being used.",
     "documentationPaths": [
       "voice/",
       "reference/voice/",
       "guides/voice/"
-    ]
-  },
-  {
-    "featureArea": "Deployment",
-    "queryIntent": "Conceptual",
-    "queryClarity": "Wrong terminology",
-    "query": "Does Mastra support serverless hosting for my agents, like can I deploy an “agent lambda” that auto-scales and runs on-demand, or do I need to run a dedicated Mastra server/container?",
-    "reasoning": "It's a conceptual deployment question, but uses wrong/loosely related terminology (“agent lambda”, “serverless hosting”) instead of Mastra's actual deployment concepts and terms.",
-    "documentationPaths": [
-      "deployment/",
-      "reference/deployment/",
-      "guides/deployment/"
-    ]
-  },
-  {
-    "featureArea": "Observability",
-    "queryIntent": "Comparison",
-    "queryClarity": "Clear & specific",
-    "query": "In Mastra observability, what's the difference between tracing and logging, and when should I use each for debugging an agent workflow (e.g., tool calls and step-by-step execution)?",
-    "reasoning": "This is a clear, specific comparison question within the Observability feature area, asking to differentiate two observability capabilities and give guidance on when to use each.",
-    "documentationPaths": [
-      "observability/",
-      "reference/observability/",
-      "guides/observability/"
-    ]
-  },
-  {
-    "featureArea": "Evals",
-    "queryIntent": "Configuration",
-    "queryClarity": "Vague/ambiguous",
-    "query": "I'm trying to set up evals for my Mastra agent, but I'm not sure what I'm supposed to configure. Where do I define the evals and what settings do I need to change to make them run the way I want?",
-    "reasoning": "This asks about how to configure Evals (where to define them and what settings control behavior) but stays vague on specifics like which eval type, framework, or desired metrics, matching a configuration intent with ambiguous clarity.",
-    "documentationPaths": [
-      "evals/",
-      "reference/evals/"
     ]
   }
 ]

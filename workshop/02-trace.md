@@ -1,6 +1,6 @@
-# Analyzing Traces
+# Generating and Analyzing Traces
 
-In this section, you'll generate traces from your synthetic queries, explore them using different observability providers, and identify failure modes specific to your application.
+In this section, you'll generate traces from your synthetic queries, explore them using different observability providers, and identify errors that you'll later group into failure modes.
 
 ## 1. Generate traces
 
@@ -13,7 +13,7 @@ pnpm dev
 Then in a separate terminal, run the trace generation script to send each query to your docs agent:
 
 ```bash
-pnpm generate-traces
+pnpm trace-generation
 ```
 
 This will:
@@ -32,42 +32,38 @@ Open each observability provider to view the generated traces. Compare their int
 
 ---
 
-## 3. Identify the first failure mode
+## 3. Identify the first error
 
-For each trace, identify the **first failure mode** you notice. A failure mode is any way the agent's response falls short of ideal.
+Go through each trace and write down what you notice:
 
-**Why focus on the first failure?** Failures often cascade — an early mistake can trigger a chain of subsequent issues. For example:
+- If the response looks **good**, write "good"
+- If there are issues, write down the **first error** you notice
+
+**Why focus on the first error?** Errors often cascade — an early mistake can trigger a chain of subsequent issues. For example:
 - Wrong tool selection → missing context → hallucinated answer
 - Misunderstood query → irrelevant search → incomplete response
 
-By fixing the root cause (the first failure), you may eliminate multiple downstream problems at once. This makes debugging more efficient than trying to fix every issue independently.
-
-Go through your traces and for each one, write down the first thing that stands out as problematic.
+By fixing the root cause (the first error), you may eliminate multiple downstream problems at once.
 
 ---
 
-## 4. Catalog all failure modes
+## 4. Group errors into failure modes
 
-Now go through the traces again, this time looking for **all failure modes** present in each response.
+Review your list of first errors and group related ones into **failure modes**. A failure mode is a category of similar errors that share a common root cause.
 
-For each trace, list every issue you observe:
+For example, these individual errors:
+- "Response says `agents/overview.mdx` instead of URL"
+- "Mentions `reference/workflows/step.mdx` file path"
+- "Includes path `memory/threads.mdx` in explanation"
 
-Common categories you might discover:
-- Hallucinated information (made up facts, incorrect API details)
-- Incomplete response (missing steps, partial code examples)
-- Wrong tool selection (used wrong docs path, missed relevant sections)
-- Off-topic response (answered something the user didn't ask)
-- Missing context (didn't provide enough background)
-- Broken/invalid links
-- Outdated information
-- Formatting issues
+...could all be grouped into the failure mode: **"Includes file paths instead of URLs"**
 
-Your failure modes will be specific to your application — don't limit yourself to this list.
+Create your failure mode categories based on the patterns you see in your specific errors.
 
 ---
 
-## 5. Rank failure modes by frequency
+## 6. Rank failure modes by frequency
 
-Create a ranked list of failure modes from most common to least common:
+Create a ranked list of failure modes from most common to least common.
 
-This ranking tells you where to focus your improvement efforts. The most frequent failure modes should be addressed first — either by improving the agent's instructions, adding better tools, or creating targeted evals.
+This ranking tells you where to focus your improvement efforts. The most frequent failure modes should be addressed first — either by improving the agent's instructions, adding better tools, or creating targeted scorers.

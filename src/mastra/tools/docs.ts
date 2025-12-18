@@ -5,7 +5,7 @@ export const docsMcp = new MCPClient({
   servers: {
     mastraDocs: {
       command: 'npx',
-      args: ['-y', '@mastra/mcp-docs-server@latest'],
+      args: ['-y', '@mastra/mcp-docs-server@beta'],
     },
   },
 });

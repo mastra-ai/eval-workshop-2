@@ -5,6 +5,8 @@ import { DefaultExporter, Observability } from "@mastra/observability";
 import { LangfuseExporter } from "@mastra/langfuse";
 import { BraintrustExporter } from "@mastra/braintrust";
 import { docsAgent } from "./agents/docs-agent";
+import { relevantLinkScorer } from "./scorers/relevant-link-scorer";
+import { mdxPathScorer } from "./scorers/mdx-path-scorer";
 
 export const mastra = new Mastra({
   agents: {
@@ -37,4 +39,8 @@ export const mastra = new Mastra({
       },
     },
   }),
+  scorers: {
+    relevantLinkScorer: relevantLinkScorer,
+    mdxPathScorer: mdxPathScorer,
+  },
 });

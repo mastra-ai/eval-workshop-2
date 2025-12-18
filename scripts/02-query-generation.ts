@@ -143,10 +143,7 @@ Generate a realistic user query that matches these dimensions.`,
   );
 
   return (
-    response.object ?? {
-      query: "How do I use Mastra?",
-      reasoning: "Fallback query",
-    }
+    response.object
   );
 }
 

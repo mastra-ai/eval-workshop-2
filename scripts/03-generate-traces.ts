@@ -22,7 +22,7 @@ function loadQueries() {
 }
 
 export const mastraClient = new MastraClient({
-  baseUrl: "http://localhost:4111/",
+  baseUrl: "http://localhost:4111",
 });
 
 const main = async () => {
@@ -33,7 +33,7 @@ const main = async () => {
   console.log(`Loaded ${queries.length} queries\n`);
 
   // Get the docs agent
-  const docsAgent = mastraClient.getAgent("docsAgent");
+  const docsAgent = await mastraClient.getAgent("docsAgent");
 
   const results: Array<{
     featureArea: string;
@@ -52,22 +52,21 @@ const main = async () => {
     console.log(`  Query: "${queryData.query.slice(0, 80)}..."`);
 
     try {
-      // Call the agent with the query
-      const response = await docsAgent.generate({
-        messages: [
-          {
-            role: "user",
-            content: queryData.query,
-          },
-        ],
+      const response = await docsAgent.generate([{ role: "user", content: queryData.query }], {
+        maxSteps: 10,
+        tracingOptions: {
+          metadata: {
+            featureArea: queryData.featureArea,
+            queryIntent: queryData.queryIntent,
+            queryClarity: queryData.queryClarity,
+          }
+        }
       });
 
       const responseText =
         typeof response.text === "string"
           ? response.text
           : JSON.stringify(response.text);
-
-      console.log(`  Response received (${responseText.length} chars)\n`);
 
       results.push({
         featureArea: queryData.featureArea,

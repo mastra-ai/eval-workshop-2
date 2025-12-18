@@ -1,7 +1,7 @@
 import { Agent } from "@mastra/core/agent";
 import { docsMcp } from "../tools/docs";
 import { linkCheckerTool } from "../tools/link-checker";
-import { openai } from "@ai-sdk/openai";
+import { relevantLinkScorer } from "../scorers/relevant-link-scorer";
 import { mdxPathScorer } from "../scorers/mdx-path-scorer";
 
 const tools = await docsMcp.listToolsets();
@@ -11,7 +11,7 @@ const mastraDocsTool = tools.mastraDocs.mastraDocs;
 const mastraExamplesTool = tools.mastraDocs.mastraExamples;
 
 export const docsAgent = new Agent({
-  id: 'docs-agent',
+  id: 'docsAgent',
   name: "docsAgent",
   defaultOptions: {
    maxSteps: 10,
@@ -61,7 +61,7 @@ export const docsAgent = new Agent({
        - Only answer questions related to Mastra
        - If user asks about unrelated topics, politely redirect to Mastra documentation
        - Ask for clarification only when the question is genuinely unclear`,
-  model: openai('gpt-5.1'),
+  model: 'openai/gpt-5.1-chat-latest',
   tools: {
     mastraBlogTool: mastraBlogTool,
     mastraDocsTool: mastraDocsTool,
@@ -69,12 +69,19 @@ export const docsAgent = new Agent({
     linkCheckerTool,
   },
   scorers: {
-    mdxPathScorer: {
-      scorer: mdxPathScorer,
-      sampling: {
-         type: "ratio",
-         rate: 0.1,
-      }
+   relevantLinkScorer: {
+    scorer: relevantLinkScorer,
+    sampling: {
+      type: 'ratio',
+      rate: 0.1,
     },
+   },
+   mdxPathScorer: {
+    scorer: mdxPathScorer,
+    sampling: {
+      type: 'ratio',
+      rate: 1,
+    },
+   },
   }
 });

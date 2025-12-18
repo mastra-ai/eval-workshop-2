@@ -10,8 +10,8 @@
     "start": "mastra start",
     "tuple-generation": "tsx --env-file=.env scripts/01-tuple-generation.ts",
     "query-generation": "tsx --env-file=.env scripts/02-query-generation.ts",
-    "generate-traces": "tsx --env-file=.env scripts/03-generate-traces.ts",
-    "run-evals": "tsx --env-file=.env scripts/03-run-evals.ts"
+    "trace-generation": "tsx --env-file=.env scripts/03-generate-traces.ts",
+    "run-evals": "tsx --env-file=.env scripts/04-run-evals.ts"
   },
   "keywords": [],
   "author": "",

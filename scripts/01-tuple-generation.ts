@@ -66,7 +66,7 @@ Generate diverse tuples that represent realistic user query scenarios for a Mast
   model: "openai/gpt-4o-mini",
 });
 
-async function generateTuples(count: number = 20) {
+async function generateTuples(count: number = 5) {
   console.log(`Generating ${count} tuples...`);
 
   const response = await tupleGeneratorAgent.generate(
@@ -96,6 +96,6 @@ async function generateTuples(count: number = 20) {
 }
 
 // Run the script
-const tuples = await generateTuples(20);
+const tuples = await generateTuples();
 console.log("\nGenerated tuples:");
 console.log(tuples);
