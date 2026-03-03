@@ -62,7 +62,7 @@ export const docsAgent = new Agent({
        - Only answer questions related to Mastra
        - If user asks about unrelated topics, politely redirect to Mastra documentation
        - Ask for clarification only when the question is genuinely unclear`,
-  model: 'openai/gpt-4.1-mini',
+  model: 'openai/gpt-4.1-nano',
   tools: {
     mastraBlogTool: mastraBlogTool,
     mastraDocsTool: mastraDocsTool,
