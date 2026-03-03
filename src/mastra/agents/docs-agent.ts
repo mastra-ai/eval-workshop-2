@@ -3,6 +3,7 @@ import { docsMcp } from "../tools/docs";
 import { linkCheckerTool } from "../tools/link-checker";
 import { relevantLinkScorer } from "../scorers/relevant-link-scorer";
 import { mdxPathScorer } from "../scorers/mdx-path-scorer";
+import { linkCheckerScorer } from "../scorers/link-checker-scorer";
 
 const tools = await docsMcp.listToolsets();
 
@@ -61,7 +62,7 @@ export const docsAgent = new Agent({
        - Only answer questions related to Mastra
        - If user asks about unrelated topics, politely redirect to Mastra documentation
        - Ask for clarification only when the question is genuinely unclear`,
-  model: 'openai/gpt-5.1-chat-latest',
+  model: 'openai/gpt-4.1-mini',
   tools: {
     mastraBlogTool: mastraBlogTool,
     mastraDocsTool: mastraDocsTool,
@@ -74,6 +75,13 @@ export const docsAgent = new Agent({
     sampling: {
       type: 'ratio',
       rate: 0.1,
+    },
+   },
+   linkCheckerScorer: {
+      scorer: linkCheckerScorer,
+      sampling: {
+      type: 'ratio',
+      rate: 1,
     },
    },
    mdxPathScorer: {

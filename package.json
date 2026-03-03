@@ -23,21 +23,19 @@
   },
   "dependencies": {
     "@ai-sdk/openai": "^2.0.87",
-    "@mastra/braintrust": "beta",
-    "@mastra/core": "beta",
-    "@mastra/evals": "beta",
-    "@mastra/langfuse": "beta",
-    "@mastra/libsql": "beta",
-    "@mastra/loggers": "beta",
-    "@mastra/mcp": "beta",
-    "@mastra/memory": "beta",
-    "@mastra/observability": "beta",
-    "zod": "^4.2.1"
+    "@mastra/core": "link:../../mastra/packages/core",
+    "@mastra/evals": "link:../../mastra/packages/evals",
+    "@mastra/libsql": "link:../../mastra/stores/libsql",
+    "@mastra/loggers": "link:../../mastra/packages/loggers",
+    "@mastra/mcp": "link:../../mastra/packages/mcp",
+    "@mastra/memory": "link:../../mastra/packages/memory",
+    "@mastra/observability": "link:../../mastra/observability/mastra",
+    "zod": "^3"
   },
   "devDependencies": {
-    "@mastra/client-js": "beta",
+    "@mastra/client-js": "link:../../mastra/client-sdks/client-js",
     "@types/node": "^25.0.2",
-    "mastra": "beta",
+    "mastra": "link:../../mastra/packages/cli",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
     "vitest": "^3.2.3"
