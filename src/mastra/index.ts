@@ -4,7 +4,6 @@ import { LibSQLStore } from "@mastra/libsql";
 import { DefaultExporter, Observability } from "@mastra/observability";
 import { docsAgent } from "./agents/docs-agent";
 import { relevantLinkScorer } from "./scorers/relevant-link-scorer";
-import { mdxPathScorer } from "./scorers/mdx-path-scorer";
 import { linkCheckerScorer } from "./scorers/link-checker-scorer";
 
 export const mastra = new Mastra({
@@ -13,7 +12,7 @@ export const mastra = new Mastra({
   },
   storage: new LibSQLStore({
     id: "mastra-storage",
-    url: `file:../../mastra.db`,
+    url: "file:./mastra.db",
   }),
   logger: new PinoLogger({
     name: "Mastra",
@@ -31,7 +30,6 @@ export const mastra = new Mastra({
   }),
   scorers: {
     relevantLinkScorer: relevantLinkScorer,
-    mdxPathScorer: mdxPathScorer,
     linkCheckerScorer: linkCheckerScorer,
   },
 });

@@ -58,75 +58,60 @@ Lower sampling rates reduce cost and latency, especially for LLM-as-Judge scorer
 
 ---
 
-## Option 2: Run Batch Evals
+## Option 2: Run an Experiment
 
-Use `runEvals` to score a dataset all at once. This is useful for:
+Use Mastra Studio to run an experiment against a dataset with scorers attached. This is useful for:
 
 - Testing changes before deploying
 - Comparing agent versions
 - Running scheduled evaluation jobs
 
-```typescript
-import { runEvals } from "@mastra/core/evals";
-import { mastra } from "../src/mastra";
-import { mdxPathScorer } from "../src/mastra/scorers/mdx-path-scorer";
-import { relevantLinkScorer } from "../src/mastra/scorers/relevant-link-scorer";
-import { allQueries } from "./queries";
+### Steps
 
-const docsAgent = mastra.getAgent("docsAgent");
+1. Open Mastra Studio at `http://localhost:4111`
+2. Navigate to your dataset (or create one — you can import from `csv/queries.csv`)
+3. Click **Run Experiment**
+4. Select **Agent** as the target type
+5. Select **docsAgent** as the target
+6. Select the scorers you want to run (e.g., `linkCheckerScorer`, `relevantLinkScorer`)
+7. Start the experiment
 
-// Prepare your test data
-const data = allQueries.map((item) => ({
-  input: item.query,
-  groundTruth: item.query, // Optional: expected output for comparison
-}));
+The experiment sends each dataset item to the agent, records the response, and runs all selected scorers against each result.
 
-// Run the evaluation
-const result = await runEvals({
-  data,
-  target: docsAgent,
-  scorers: [mdxPathScorer, relevantLinkScorer],
-  onItemComplete: ({ scorerResults }) => {
-    // Log progress as each item completes
-    console.log(`MDX Path: ${scorerResults["mdx-path-scorer"].score}`);
-    console.log(`Links: ${scorerResults["relevant-link-scorer"].score}`);
-  },
-});
+### Reviewing results
 
-console.log(JSON.stringify(result, null, 2));
-```
+After the experiment completes, Studio shows:
 
-### The `runEvals` function
+- **Per-item scores** — each query with its scorer results
+- **Aggregate stats** — pass rate, average score, error count
+- **Detailed reasons** — why each scorer gave its score
 
-| Parameter | Description |
-|-----------|-------------|
-| `data` | Array of `{ input, groundTruth? }` objects |
-| `target` | The agent to evaluate |
-| `scorers` | Array of scorer functions to run |
-| `onItemComplete` | Callback after each item is scored (optional) |
+### Comparing experiments
 
-### Run it
+After running multiple experiments (e.g., before and after changing agent instructions), you can compare them in Studio:
 
-```bash
-pnpm run-evals
-```
+1. Go to your dataset's **Experiments** tab
+2. Select two experiments to compare
+3. Studio shows a side-by-side diff of scores, highlighting regressions and improvements
+
+This makes it easy to validate that a change actually improved quality before deploying.
 
 ---
 
 ## Comparing the Two Approaches
 
-| | Agent Scorers | Batch Evals |
+| | Agent Scorers | Experiments |
 |---|---|---|
 | **When it runs** | Every `generate()` call | On demand |
 | **Use case** | Production monitoring | Pre-deploy testing |
-| **Data source** | Live user queries | Synthetic dataset |
+| **Data source** | Live user queries | Dataset |
 | **Sampling** | Configurable rate | Always 100% |
-| **Output** | Sent to observability tools | Returned as JSON |
+| **Output** | Sent to observability tools | Viewable in Studio |
 
 ### Recommendation
 
 Use **both**:
-1. Run **batch evals** before deploying changes to catch regressions
+1. Run **experiments** before deploying changes to catch regressions
 2. Attach **agent scorers** in production to monitor real-world quality
 
 ---
@@ -134,6 +119,6 @@ Use **both**:
 ## Exercise
 
 1. Add both scorers to your agent with a sampling rate of `1`
-2. Run `pnpm run-evals` on your query dataset
-3. Review the scores which queries failed? Why?
-4. Check your observability tool (Langfuse/Braintrust) to see the scores attached to traces
+2. Run an experiment in Studio with your dataset and scorers
+3. Review the scores — which queries failed? Why?
+4. Make a change to your agent (e.g., update instructions) and run a new experiment to compare

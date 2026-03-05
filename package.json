@@ -8,10 +8,7 @@
     "dev": "mastra dev",
     "build": "mastra build",
     "start": "mastra start",
-    "tuple-generation": "tsx --env-file=.env scripts/01-tuple-generation.ts",
-    "query-generation": "tsx --env-file=.env scripts/02-query-generation.ts",
-    "trace-generation": "tsx --env-file=.env scripts/03-generate-traces.ts",
-    "run-evals": "tsx --env-file=.env scripts/04-run-evals.ts"
+    "ci:eval": "vitest run scripts/bonus-ci-eval.test.ts"
   },
   "keywords": [],
   "author": "",
@@ -23,19 +20,19 @@
   },
   "dependencies": {
     "@ai-sdk/openai": "^2.0.87",
-    "@mastra/core": "link:../../mastra/packages/core",
-    "@mastra/evals": "link:../../mastra/packages/evals",
-    "@mastra/libsql": "link:../../mastra/stores/libsql",
-    "@mastra/loggers": "link:../../mastra/packages/loggers",
-    "@mastra/mcp": "link:../../mastra/packages/mcp",
-    "@mastra/memory": "link:../../mastra/packages/memory",
-    "@mastra/observability": "link:../../mastra/observability/mastra",
+    "@mastra/core": "0.0.0-dataset-demo-20260305035339",
+    "@mastra/evals": "0.0.0-dataset-demo-20260305035339",
+    "@mastra/libsql": "0.0.0-dataset-demo-20260305035339",
+    "@mastra/loggers": "0.0.0-dataset-demo-20260305035339",
+    "@mastra/mcp": "0.0.0-dataset-demo-20260305035339",
+    "@mastra/memory": "0.0.0-dataset-demo-20260305035339",
+    "@mastra/observability": "0.0.0-dataset-demo-20260305035339",
     "zod": "^3"
   },
   "devDependencies": {
-    "@mastra/client-js": "link:../../mastra/client-sdks/client-js",
+    "@mastra/client-js": "0.0.0-dataset-demo-20260305035339",
     "@types/node": "^25.0.2",
-    "mastra": "link:../../mastra/packages/cli",
+    "mastra": "0.0.0-dataset-demo-20260305035339",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
     "vitest": "^3.2.3"

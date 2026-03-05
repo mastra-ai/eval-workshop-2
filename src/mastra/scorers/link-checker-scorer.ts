@@ -49,5 +49,5 @@ export const linkCheckerScorer = createScorer({
       return `linkCheckerTool was called to validate ${urlCount} link(s).`;
     }
 
-    return `Response contains ${urlCount} URL(s) but linkCheckerTool was never called.`;
+    return `Response contains ${urlCount} URL(s) that were not validated.`;
   });

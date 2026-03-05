@@ -66,7 +66,7 @@ ${assistantMessage}
   .analyze({
     description: "Check if the response contains relevant links",
     judge: {
-      model: "openai/gpt-5.1",
+      model: "openai/gpt-4.1",
       instructions: `You are an expert evaluator for a documentation assistant.
     
     TASK: For each link in the response, determine if it is relevant to the user's question.
@@ -147,6 +147,7 @@ ${linksWithContext.links
     },
   })
   .generateScore(({ results }) => {
+    results.analyzeStepResult
     const evaluations = results.analyzeStepResult.verdicts;
 
     if (evaluations.some((evaluation) => !evaluation.isRelevant)) {

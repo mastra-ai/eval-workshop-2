@@ -65,35 +65,26 @@ The agent is configured to:
 | `pnpm dev` | Start Mastra development server |
 | `pnpm build` | Build the project |
 | `pnpm test` | Run tests with Vitest |
-| `pnpm tuple-generation` | Generate dimension tuples for synthetic queries |
-| `pnpm query-generation` | Generate synthetic user queries from tuples |
-| `pnpm generate-traces` | Run queries against the agent to generate traces |
-| `pnpm run-evals` | Run batch evaluations with scorers |
+| `pnpm ci:eval` | Run CI evaluation with link checker scorer |
 
 ## Workshop Documentation
 
 The `workshop/` directory contains step-by-step guides for the evaluation process:
 
-### [01-synthetic-dataset.md](workshop/01-synthetic-dataset.md)
-Learn how to create a synthetic dataset for testing your agent:
-1. Define dimensions of user queries (feature area, intent, clarity)
-2. Generate tuples using those dimensions
-3. Create realistic queries from tuples using documentation context
+### [01-dataset-and-experiment.md](workshop/01-dataset-and-experiment.md)
+Create a dataset and run an experiment to identify failure modes:
+1. Create a dataset of test queries in Mastra Studio
+2. Run an experiment against your docs agent
+3. Review results and identify the first error in each response
+4. Group errors into failure modes and rank by frequency
 
-### [02-trace.md](workshop/02-trace.md)
-Generate and analyze traces to identify failure modes:
-1. Run queries against your agent to generate traces
-2. Explore traces in different observability providers (Langfuse, Braintrust, Mastra Studio)
-3. Identify the first failure mode in each trace
-4. Catalog and rank failure modes by frequency
-
-### [03-create-scorer.md](workshop/03-create-scorer.md)
+### [02-create-scorer.md](workshop/02-create-scorer.md)
 Create custom scorers to detect failure modes:
 1. Understand code-based vs LLM-as-judge scorers
 2. Learn the four-step scorer pipeline
 3. Build a code-based scorer (example: detecting `.mdx` paths)
 
-### [04-applying-scorers.md](workshop/04-applying-scorers.md)
+### [03-applying-scorers.md](workshop/03-applying-scorers.md)
 Apply scorers to evaluate your agent:
 1. Attach scorers to an agent for online evals (production monitoring)
 2. Run batch evals for offline testing before deploying
@@ -112,18 +103,11 @@ Apply scorers to evaluate your agent:
 │   │   └── link-checker.ts     # URL validation tool
 │   └── index.ts                # Mastra configuration
 ├── scripts/
-│   ├── 01-tuple-generation.ts  # Generate dimension tuples
-│   ├── 02-query-generation.ts  # Generate queries from tuples
-│   ├── 03-generate-traces.ts   # Run queries and collect traces
-│   ├── 04-run-evals.ts         # Run batch evaluations
-│   ├── tuples.json             # Generated tuples
-│   ├── queries.json            # Generated queries
-│   └── traces.json             # Collected traces
+│   └── bonus-ci-eval.test.ts   # CI evaluation test
 └── workshop/
-    ├── 01-synthetic-dataset.md
-    ├── 02-trace.md
-    ├── 03-create-scorer.md
-    └── 04-applying-scorers.md
+    ├── 01-dataset-and-experiment.md
+    ├── 02-create-scorer.md
+    └── 03-applying-scorers.md
 ```
 
 ## Observability

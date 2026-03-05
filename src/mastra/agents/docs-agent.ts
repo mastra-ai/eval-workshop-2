@@ -2,8 +2,8 @@ import { Agent } from "@mastra/core/agent";
 import { docsMcp } from "../tools/docs";
 import { linkCheckerTool } from "../tools/link-checker";
 import { relevantLinkScorer } from "../scorers/relevant-link-scorer";
-import { mdxPathScorer } from "../scorers/mdx-path-scorer";
 import { linkCheckerScorer } from "../scorers/link-checker-scorer";
+import { Memory } from "@mastra/memory";
 
 const tools = await docsMcp.listToolsets();
 
@@ -17,6 +17,7 @@ export const docsAgent = new Agent({
   defaultOptions: {
    maxSteps: 10,
   },
+  memory: new Memory(),
   instructions: `You are a helpful assistant specialized in Mastra documentation and usage.
 
     Complete user queries fully before ending your turn. Only ask for clarification if the question is genuinely unclear.
@@ -44,7 +45,6 @@ export const docsAgent = new Agent({
        - For docs: use https://mastra.ai/docs/$DOCS_PATH (never include .mdx extension)
        - For templates: use https://github.com/mastra-ai/mastra/tree/main/templates/$TEMPLATE_NAME
        - Only share URLs that linkCheckerTool confirms as valid
-       - If a URL fails validation, try alternative paths or inform the user
 
     2. TOOL USAGE:
        - Always use provided tools to answer questions
@@ -69,27 +69,27 @@ export const docsAgent = new Agent({
     mastraExamplesTool: mastraExamplesTool,
     linkCheckerTool,
   },
-  scorers: {
-   relevantLinkScorer: {
-    scorer: relevantLinkScorer,
-    sampling: {
-      type: 'ratio',
-      rate: 0.1,
-    },
-   },
-   linkCheckerScorer: {
-      scorer: linkCheckerScorer,
-      sampling: {
-      type: 'ratio',
-      rate: 1,
-    },
-   },
-   mdxPathScorer: {
-    scorer: mdxPathScorer,
-    sampling: {
-      type: 'ratio',
-      rate: 1,
-    },
-   },
-  }
+  // scorers: {
+  //  relevantLinkScorer: {
+  //   scorer: relevantLinkScorer,
+  //   sampling: {
+  //     type: 'ratio',
+  //     rate: 0.1,
+  //   },
+  //  },
+  //  linkCheckerScorer: {
+  //     scorer: linkCheckerScorer,
+  //     sampling: {
+  //     type: 'ratio',
+  //     rate: 1,
+  //   },
+  //  },
+  //  mdxPathScorer: {
+  //   scorer: mdxPathScorer,
+  //   sampling: {
+  //     type: 'ratio',
+  //     rate: 1,
+  //   },
+  //  },
+  // }
 });
