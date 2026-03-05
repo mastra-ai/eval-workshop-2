@@ -63,9 +63,6 @@ The agent is configured to:
 | Script | Description |
 |--------|-------------|
 | `pnpm dev` | Start Mastra development server |
-| `pnpm build` | Build the project |
-| `pnpm test` | Run tests with Vitest |
-| `pnpm ci:eval` | Run CI evaluation with link checker scorer |
 
 ## Workshop Documentation
 
