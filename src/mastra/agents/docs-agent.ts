@@ -69,27 +69,20 @@ export const docsAgent = new Agent({
     mastraExamplesTool: mastraExamplesTool,
     linkCheckerTool,
   },
-  // scorers: {
-  //  relevantLinkScorer: {
-  //   scorer: relevantLinkScorer,
-  //   sampling: {
-  //     type: 'ratio',
-  //     rate: 0.1,
-  //   },
-  //  },
-  //  linkCheckerScorer: {
-  //     scorer: linkCheckerScorer,
-  //     sampling: {
-  //     type: 'ratio',
-  //     rate: 1,
-  //   },
-  //  },
-  //  mdxPathScorer: {
-  //   scorer: mdxPathScorer,
-  //   sampling: {
-  //     type: 'ratio',
-  //     rate: 1,
-  //   },
-  //  },
-  // }
+  scorers: {
+   relevantLinkScorer: {
+    scorer: relevantLinkScorer,
+    sampling: {
+      type: 'ratio',
+      rate: 0.1,
+    },
+   },
+   linkCheckerScorer: {
+      scorer: linkCheckerScorer,
+      sampling: {
+      type: 'ratio',
+      rate: 1,
+    },
+   },
+  }
 });
